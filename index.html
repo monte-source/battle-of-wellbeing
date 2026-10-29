@@ -11,7 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Mali:wght@600;700&family=Silkscreen:wght@400;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <!-- Full-screen Canvas for Visual Effects, Confetti, Shockwaves & Flying Tokens -->
@@ -133,30 +133,30 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- TRAMPOLINE DICE PAD (Bottom-Center, just like Reference Image 1!) -->
-      <div class="trampoline-dice-station" id="d4-3d-wrapper" title="คลิกหรือกด Spacebar เพื่อทอยลูกเต๋า 4 หน้า!">
-        <div class="d4-jumping-cube" id="d4-pyramid">
-          <div class="cube-face-top">
-            <span class="cube-dots">• •</span>
-          </div>
-          <div class="cube-face-front">
-            <span class="d4-number" id="d4-number-display">4</span>
-          </div>
-          <div class="cube-face-side">
-            <span class="cube-dots">• • •</span>
-          </div>
+    <!-- TRAMPOLINE DICE PAD (Independent Top-Level UI, High Z-Index) -->
+    <div class="trampoline-dice-station" id="d4-3d-wrapper" title="คลิกหรือแตะเพื่อทอยลูกเต๋า 4 หน้า!">
+      <div class="d4-jumping-cube" id="d4-pyramid">
+        <div class="cube-face-top">
+          <span class="cube-dots">• •</span>
         </div>
-        <div class="trampoline-pad" id="trampoline-pad">
-          <div class="trampoline-mat">
-            <span class="trampoline-hint">คลิกทอย (1–4)</span>
-          </div>
-          <div class="trampoline-legs"></div>
+        <div class="cube-face-front">
+          <span class="d4-number" id="d4-number-display">4</span>
         </div>
-        <button type="button" id="roll-dice-btn" class="trampoline-cta-pill pulse-cta">
-          🎲 ทอยลูกเต๋า 4 หน้า (SPACE)
-        </button>
+        <div class="cube-face-side">
+          <span class="cube-dots">• • •</span>
+        </div>
       </div>
+      <div class="trampoline-pad" id="trampoline-pad">
+        <div class="trampoline-mat">
+          <span class="trampoline-hint">แตะทอย (1–4)</span>
+        </div>
+        <div class="trampoline-legs"></div>
+      </div>
+      <button type="button" id="roll-dice-btn" class="trampoline-cta-pill pulse-cta">
+        🎲 ทอยลูกเต๋า 4 หน้า (SPACE)
+      </button>
     </div>
 
     <!-- Bottom-Left Quick Diary, Card Editor & 3D Camera Controls -->
@@ -647,9 +647,9 @@
   <div id="game-toast"></div>
 
   <!-- Scripts -->
-  <script src="audio.js?v=3"></script>
-  <script src="fx.js?v=3"></script>
-  <script src="cards-data.js?v=3"></script>
-  <script src="game.js?v=3"></script>
+  <script src="audio.js?v=4"></script>
+  <script src="fx.js?v=4"></script>
+  <script src="cards-data.js?v=4"></script>
+  <script src="game.js?v=4"></script>
 </body>
 </html>

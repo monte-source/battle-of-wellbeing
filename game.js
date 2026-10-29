@@ -114,7 +114,11 @@ class WellbeingGame {
     this.camSuppressClick = false;
 
     const isExcluded = (target) =>
-      target.closest('button, input, .trampoline-dice-station, #original-board-overlay');
+      Boolean(
+        target.closest(
+          'button, input, select, textarea, .trampoline-dice-station, .bottom-left-dock, .bottom-right-round-controls, .top-hud-bar, .player-medallions-layer, .modal-backdrop, #original-board-overlay'
+        )
+      );
 
     vp.addEventListener('pointerdown', (e) => {
       if (isExcluded(e.target)) return;
@@ -194,8 +198,10 @@ class WellbeingGame {
       'click',
       (e) => {
         if (this.camSuppressClick) {
-          e.stopPropagation();
-          e.preventDefault();
+          if (!isExcluded(e.target)) {
+            e.stopPropagation();
+            e.preventDefault();
+          }
           this.camSuppressClick = false;
         }
       },
@@ -345,21 +351,67 @@ class WellbeingGame {
       });
     }
 
-    // Start Game button
-    document.getElementById('start-game-btn').addEventListener('click', () => {
+    // Start Game button (Touch & Click support)
+    const startBtn = document.getElementById('start-game-btn');
+    if (startBtn) {
+      const handleStart = (e) => {
+        if (e && e.cancelable && e.type !== 'click') e.preventDefault();
+        window.soundEngine.init();
+        window.soundEngine.playClick();
+        this.startNewGame();
+      };
+      startBtn.addEventListener('click', handleStart);
+      startBtn.addEventListener('touchend', handleStart, { passive: false });
+    }
+
+    // Roll D4 via Trampoline Pad, Button, Station, Turn Banner, or Spacebar
+    let lastRollTime = 0;
+    const triggerRoll = (e) => {
+      const now = Date.now();
+      if (now - lastRollTime < 400) return;
+      lastRollTime = now;
+
+      if (e) {
+        if (e.cancelable && e.type !== 'click') e.preventDefault();
+        e.stopPropagation();
+      }
+
       window.soundEngine.init();
-      window.soundEngine.playClick();
-      this.startNewGame();
+
+      if (this.phase !== 'READY_TO_ROLL') {
+        if (this.phase === 'SETUP') {
+          this.showToast('กรุณากดปุ่ม "เริ่มออกเดินทาง" ในหน้าต่างตั้งค่าก่อนครับ');
+        } else if (this.phase === 'CARD_MODAL') {
+          this.showToast('กำลังทำภารกิจการ์ดอยู่ กรุณาเลือกผลลัพธ์ในการ์ดก่อนครับ');
+        }
+        return;
+      }
+
+      this.handleRollClick();
+    };
+
+    const rollBtn = document.getElementById('roll-dice-btn');
+    const d4Wrapper = document.getElementById('d4-3d-wrapper');
+    const d4Pyramid = document.getElementById('d4-pyramid');
+    const trampolinePad = document.getElementById('trampoline-pad');
+    const turnBanner = document.getElementById('current-turn-banner');
+
+    [rollBtn, d4Wrapper, d4Pyramid, trampolinePad].forEach((el) => {
+      if (!el) return;
+      el.addEventListener('click', triggerRoll);
+      el.addEventListener('touchend', triggerRoll, { passive: false });
     });
 
-    // Roll D4 via Trampoline Pad, Button, or Spacebar
-    document.getElementById('roll-dice-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.handleRollClick();
-    });
-    document.getElementById('d4-3d-wrapper').addEventListener('click', () => {
-      this.handleRollClick();
-    });
+    if (turnBanner) {
+      turnBanner.style.cursor = 'pointer';
+      turnBanner.title = 'แตะเพื่อทอยลูกเต๋า 4 หน้า';
+      turnBanner.addEventListener('click', () => {
+        if (this.phase === 'READY_TO_ROLL') triggerRoll();
+      });
+      turnBanner.addEventListener('touchend', (e) => {
+        if (this.phase === 'READY_TO_ROLL') triggerRoll(e);
+      }, { passive: false });
+    }
 
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space' && this.phase === 'READY_TO_ROLL') {
@@ -389,10 +441,17 @@ class WellbeingGame {
       });
     }
 
-    // Bonus Roll button
-    document.getElementById('bonus-roll-btn').addEventListener('click', () => {
-      this.executeBonusRoll();
-    });
+    // Bonus Roll button (Touch & Click)
+    const bonusRollBtn = document.getElementById('bonus-roll-btn');
+    if (bonusRollBtn) {
+      const handleBonusRoll = (e) => {
+        if (e && e.cancelable && e.type !== 'click') e.preventDefault();
+        window.soundEngine.init();
+        this.executeBonusRoll();
+      };
+      bonusRollBtn.addEventListener('click', handleBonusRoll);
+      bonusRollBtn.addEventListener('touchend', handleBonusRoll, { passive: false });
+    }
 
     // Diary Modal Open / Close / Prev / Next Player
     document.getElementById('btn-open-diary').addEventListener('click', () => {
@@ -945,22 +1004,29 @@ class WellbeingGame {
     avEl.style.background = p.color;
 
     document.getElementById('turn-player-name').textContent = `${p.name} (🪙 ${p.tokens} โทเคน)`;
-    document.getElementById('turn-step-status').textContent =
-      'คลิกที่แท่นแทรมโพลีน (หรือกด Spacebar) เพื่อทอยลูกเต๋า 4 หน้า!';
+
+    const isMobile = window.innerWidth <= 768;
+    document.getElementById('turn-step-status').textContent = isMobile
+      ? '👉 แตะที่ลูกเต๋า หรือแตะแถบนี้เพื่อทอยเต๋า (1–4)!'
+      : 'คลิกที่แท่นแทรมโพลีน (หรือกด Spacebar) เพื่อทอยลูกเต๋า 4 หน้า!';
 
     const rollBtn = document.getElementById('roll-dice-btn');
-    rollBtn.disabled = false;
+    if (rollBtn) {
+      rollBtn.disabled = false;
+      rollBtn.textContent = isMobile ? '🎲 แตะทอยเต๋า (1–4)' : '🎲 ทอยลูกเต๋า 4 หน้า (SPACE)';
+    }
   }
 
   // ==========================================================================
   // TRAMPOLINE 4-SIDED DIE (D4) ROLL & MOVEMENT
   // ==========================================================================
   handleRollClick() {
+    window.soundEngine.init();
     if (this.phase !== 'READY_TO_ROLL') return;
     this.phase = 'ROLLING';
 
     const rollBtn = document.getElementById('roll-dice-btn');
-    rollBtn.disabled = true;
+    if (rollBtn) rollBtn.disabled = true;
 
     const d4El = document.getElementById('d4-pyramid');
     const d4Num = document.getElementById('d4-number-display');

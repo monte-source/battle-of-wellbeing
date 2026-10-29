@@ -11,7 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Mali:wght@600;700&family=Silkscreen:wght@400;700&display=swap"
     rel="stylesheet"
   />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
   <!-- Full-screen Canvas for Visual Effects, Confetti, Shockwaves & Flying Tokens -->
@@ -489,12 +489,14 @@
             </div>
 
             <div class="card-tools-bar">
-              <button type="button" id="tts-read-card-btn" class="tool-mini-btn">
-                🔊 อ่านออกเสียง (TTS)
+              <button type="button" id="tts-read-card-btn" class="tool-mini-btn" title="ฟังเสียงอ่านการ์ด">
+                🔊 อ่านออกเสียง
               </button>
-              <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="15">⏱️ 15 วิ</button>
-              <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="30">⏱️ 30 วิ</button>
-              <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="45">⏱️ 45 วิ</button>
+              <span id="mission-timer-buttons-group">
+                <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="15">⏱️ 15 วิ</button>
+                <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="30">⏱️ 30 วิ</button>
+                <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="45">⏱️ 45 วิ</button>
+              </span>
               <span id="mission-timer-display" class="hidden">⏱️ 30 วินาที</span>
             </div>
 
@@ -645,9 +647,9 @@
   <div id="game-toast"></div>
 
   <!-- Scripts -->
-  <script src="audio.js"></script>
-  <script src="fx.js"></script>
-  <script src="cards-data.js"></script>
-  <script src="game.js"></script>
+  <script src="audio.js?v=3"></script>
+  <script src="fx.js?v=3"></script>
+  <script src="cards-data.js?v=3"></script>
+  <script src="game.js?v=3"></script>
 </body>
 </html>

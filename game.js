@@ -1136,6 +1136,19 @@ class WellbeingGame {
       .join('');
     document.getElementById('card-mission-penalty-text').textContent = card.penaltyLabel;
 
+    // Show stopwatch timers ONLY for timed challenges (e.g. plank, balance, laugh yoga, stare)
+    const isTimed =
+      (card.tiers && card.tiers.some((t) => t.label.includes('วินาที') || t.label.includes('วิ'))) ||
+      (card.title && (card.title.includes('วินาที') || card.title.includes('วิ')));
+    const timerGroup = document.getElementById('mission-timer-buttons-group');
+    if (timerGroup) {
+      timerGroup.style.display = isTimed ? 'inline-flex' : 'none';
+    }
+    const timerDisplay = document.getElementById('mission-timer-display');
+    if (timerDisplay) {
+      timerDisplay.classList.add('hidden');
+    }
+
     this.renderCardActionButtons(player, card, meta);
 
     modal.classList.remove('hidden');

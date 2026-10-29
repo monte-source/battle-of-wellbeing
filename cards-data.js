@@ -69,13 +69,13 @@ const DEFAULT_CARDS = {
   green: [
     {
       id: 'green-1',
-      title: 'โทรหาเพื่อนเก่า',
+      title: 'ส่งสติกเกอร์หรือเล่าถึงเพื่อนเก่าที่คิดถึง',
       tiers: [
-        { label: '1 คน = 1 โทเคน', tokens: 1 },
-        { label: '3 คน = 2 โทเคน', tokens: 2 },
-        { label: '5 คน = 3 โทเคน', tokens: 3 },
+        { label: 'เล่าหรือทัก 1 คน = 1 โทเคน', tokens: 1 },
+        { label: 'เล่าหรือทัก 2 คน = 2 โทเคน', tokens: 2 },
+        { label: 'เล่าหรือทัก 3 คน = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่โทร = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่เล่า = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
@@ -102,13 +102,13 @@ const DEFAULT_CARDS = {
     },
     {
       id: 'green-4',
-      title: 'ส่งข้อความขอบคุณคนที่คิดถึง',
+      title: 'บอกชื่อคนที่อยากขอบคุณพร้อมเหตุผล (หรือส่งข้อความขอบคุณ)',
       tiers: [
-        { label: '1 คน = 1 โทเคน', tokens: 1 },
-        { label: '2 คน = 2 โทเคน', tokens: 2 },
-        { label: '3 คน = 3 โทเคน', tokens: 3 },
+        { label: 'บอก 1 คน = 1 โทเคน', tokens: 1 },
+        { label: 'บอก 2 คน = 2 โทเคน', tokens: 2 },
+        { label: 'บอก 3 คน = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่ส่ง = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่บอก = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
@@ -240,13 +240,13 @@ const DEFAULT_CARDS = {
     },
     {
       id: 'red-6',
-      title: 'ดื่มน้ำเปล่าเติมความสดชื่นตอนนี้',
+      title: 'ดื่มน้ำเปล่า หรือบอกชื่อเครื่องดื่มสุขภาพที่ชอบดื่ม',
       tiers: [
-        { label: '3 อึก = 1 โทเคน', tokens: 1 },
-        { label: 'ครึ่งแก้ว = 2 โทเคน', tokens: 2 },
-        { label: 'หมด 1 แก้ว = 3 โทเคน', tokens: 3 },
+        { label: 'ดื่ม 3 อึก หรือบอก 1 เมนู = 1 โทเคน', tokens: 1 },
+        { label: 'ดื่มครึ่งแก้ว หรือบอก 2 เมนู = 2 โทเคน', tokens: 2 },
+        { label: 'ดื่ม 1 แก้ว หรือบอก 3 เมนู = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่ดื่ม = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่ทำ = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
@@ -417,13 +417,13 @@ const DEFAULT_CARDS = {
   yellow: [
     {
       id: 'yellow-1',
-      title: 'ตั้งเป้าหมายดูแลสุขภาพในเดือนนี้',
+      title: 'บอกเป้าหมายสุขภาพดีที่อยากทำให้สำเร็จในเดือนนี้',
       tiers: [
-        { label: '1 เป้าหมาย = 1 โทเคน', tokens: 1 },
-        { label: '2 เป้าหมาย = 2 โทเคน', tokens: 2 },
-        { label: '3 เป้าหมาย = 3 โทเคน', tokens: 3 },
+        { label: 'บอก 1 เป้าหมาย = 1 โทเคน', tokens: 1 },
+        { label: 'บอก 2 เป้าหมาย = 2 โทเคน', tokens: 2 },
+        { label: 'บอก 3 เป้าหมาย = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่ตั้งเป้าหมาย = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่บอก = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
@@ -439,13 +439,13 @@ const DEFAULT_CARDS = {
     },
     {
       id: 'yellow-3',
-      title: 'วางแผนเข้านอนเร็วขึ้นเพื่อพักผ่อนให้เพียงพอ',
+      title: 'บอกเวลาเข้านอนในฝัน พร้อม 1 วิธีช่วยให้หลับสบายขึ้น',
       tiers: [
-        { label: 'ทำ 1 วัน/สัปดาห์ = 1 โทเคน', tokens: 1 },
-        { label: 'ทำ 3 วัน/สัปดาห์ = 2 โทเคน', tokens: 2 },
-        { label: 'ทำ 5 วัน/สัปดาห์ = 3 โทเคน', tokens: 3 },
+        { label: 'บอก 1 วิธี = 1 โทเคน', tokens: 1 },
+        { label: 'บอก 2 วิธี = 2 โทเคน', tokens: 2 },
+        { label: 'บอก 3 วิธี = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่วางแผน = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่บอก = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
@@ -461,7 +461,7 @@ const DEFAULT_CARDS = {
     },
     {
       id: 'yellow-5',
-      title: 'ตั้งเป้าออมเงินหรือจัดสรรเวลาเพื่ออนาคต',
+      title: 'บอกไอเดียจัดสรรเวลาหรือออมเงินเพื่ออนาคต',
       tiers: [
         { label: 'บอก 1 แผน = 1 โทเคน', tokens: 1 },
         { label: 'บอก 2 แผน = 2 โทเคน', tokens: 2 },
@@ -483,24 +483,24 @@ const DEFAULT_CARDS = {
     },
     {
       id: 'yellow-7',
-      title: 'วางแผนลดเวลาเล่นโซเชียลก่อนนอน',
+      title: 'บอกวิธีหรือเทคนิคลดเวลาเล่นมือถือก่อนนอน',
       tiers: [
-        { label: 'ลด 15 นาที = 1 โทเคน', tokens: 1 },
-        { label: 'ลด 30 นาที = 2 โทเคน', tokens: 2 },
-        { label: 'ลด 60 นาที = 3 โทเคน', tokens: 3 },
+        { label: 'บอก 1 วิธี = 1 โทเคน', tokens: 1 },
+        { label: 'บอก 2 วิธี = 2 โทเคน', tokens: 2 },
+        { label: 'บอก 3 วิธี = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่ลด = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่บอก = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
       id: 'yellow-8',
-      title: 'ตั้งใจทำความดีช่วยเหลือผู้อื่นในสัปดาห์หน้า',
+      title: 'บอกเรื่องดีๆ ที่ตั้งใจจะทำให้เพื่อนหรือครอบครัว',
       tiers: [
-        { label: '1 อย่าง = 1 โทเคน', tokens: 1 },
-        { label: '2 อย่าง = 2 โทเคน', tokens: 2 },
-        { label: '3 อย่าง = 3 โทเคน', tokens: 3 },
+        { label: 'บอก 1 เรื่อง = 1 โทเคน', tokens: 1 },
+        { label: 'บอก 2 เรื่อง = 2 โทเคน', tokens: 2 },
+        { label: 'บอก 3 เรื่อง = 3 โทเคน', tokens: 3 },
       ],
-      penaltyLabel: 'ไม่ตั้งใจ = จ่าย 2 โทเคน',
+      penaltyLabel: 'ไม่บอก = จ่าย 2 โทเคน',
       penaltyTokens: 2,
     },
     {
@@ -528,13 +528,25 @@ const DEFAULT_CARDS = {
   ],
 };
 
-const STORAGE_KEY = 'battle_of_wellbeing_cards_v1';
+const STORAGE_KEY = 'battle_of_wellbeing_cards_v3';
 
 function loadAllCards() {
   try {
+    // Purge outdated caches from v1/v2 or legacy cards
+    localStorage.removeItem('battle_of_wellbeing_cards_v1');
+    localStorage.removeItem('battle_of_wellbeing_cards_v2');
+
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
+      // If cached data contains old non-instant social media card, discard cache
+      const hasOldCard = parsed?.yellow?.some(
+        (c) => c.title && c.title.includes('วางแผนลดเวลาเล่นโซเชียล')
+      );
+      if (hasOldCard) {
+        localStorage.removeItem(STORAGE_KEY);
+        return JSON.parse(JSON.stringify(DEFAULT_CARDS));
+      }
       if (parsed && parsed.red && parsed.blue && parsed.green && parsed.yellow) {
         return parsed;
       }

@@ -2077,6 +2077,12 @@ body {
   margin-bottom: 6px;
 }
 
+#mission-timer-buttons-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .tool-mini-btn {
   padding: 4px 9px;
   border-radius: 8px;

@@ -1,0 +1,2369 @@
+/* ============================================================================
+   BATTLE OF WELLBEING (ศึกชิงสุขภาพดี)
+   Part 1: 3D Isometric Blocky Island Board Game UI (Reference Image 1)
+   Part 2: Cozy Open-Book Pixel/Illustrated Diary UI (Reference Image 2)
+   ============================================================================ */
+
+:root {
+  /* Reference 1: Isometric Island Palette */
+  --ocean-bg: #3e3b52;
+  --ocean-deep: #333046;
+  --grass-lime: #7ae582;
+  --grass-edge: #4eb857;
+  --earth-orange: #f3722c;
+  --earth-shadow: #ba4a12;
+
+  /* Isometric Tile Top & Extruded Wall Colors */
+  --tile-red-top: #ff6b4a;
+  --tile-red-wall: #c83e20;
+  --tile-blue-top: #38d2e8;
+  --tile-blue-wall: #1694a8;
+  --tile-green-top: #76e33c;
+  --tile-green-wall: #47a814;
+  --tile-yellow-top: #ffd22b;
+  --tile-yellow-wall: #cca00a;
+  --tile-cream-top: #f7e6c4;
+  --tile-cream-wall: #bda67e;
+
+  /* Reference 2: Cozy Open-Book Diary Palette */
+  --diary-ink: #5a3a31;
+  --diary-ink-soft: #856054;
+  --diary-paper: #fcf3e3;
+  --diary-paper-alt: #f7e8d0;
+  --diary-cover: #c89d88;
+  --diary-cover-dark: #946854;
+  --diary-graph-bg: #faf5ef;
+
+  --font-main: 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-pixel: 'Silkscreen', 'Kanit', monospace, sans-serif;
+  --font-hand: 'Mali', 'Kanit', cursive, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-main);
+  background: var(--ocean-bg);
+  color: var(--diary-ink);
+  user-select: none;
+}
+
+#fx-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ============================================================================
+   PART 1: MAIN OCEAN & 3D ISOMETRIC ISLAND STAGE (Reference Image 1)
+   ============================================================================ */
+.ocean-world-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background:
+    radial-gradient(circle at 50% 48%, #494563 0%, var(--ocean-bg) 62%, var(--ocean-deep) 100%);
+  overflow: hidden;
+}
+
+.ocean-waves-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wave-mark {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  animation: waveBob 3.6s ease-in-out infinite;
+}
+
+.lily-pad {
+  position: absolute;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.25));
+  animation: waveBob 4.2s ease-in-out infinite reverse;
+}
+
+@keyframes waveBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Top-Center Compact Turn & Treasury HUD */
+.top-floating-hud {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.hud-treasury-pill {
+  background: var(--diary-paper);
+  border: 3px solid var(--diary-ink);
+  border-radius: 999px;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+
+.treasury-icon {
+  font-size: 1.35rem;
+}
+
+.treasury-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.treasury-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--diary-ink-soft);
+  text-transform: uppercase;
+}
+
+.treasury-val {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+}
+
+.treasury-mini-bar {
+  width: 54px;
+  height: 8px;
+  background: #e5d2b8;
+  border: 1.5px solid var(--diary-ink);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+#central-pool-bar {
+  height: 100%;
+  width: 80%;
+  background: #ffd22b;
+  transition: width 0.35s ease;
+}
+
+.hud-turn-speech {
+  background: #ffffff;
+  border: 3px solid var(--diary-ink);
+  border-radius: 999px;
+  padding: 6px 18px 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.28);
+}
+
+.turn-round-tag {
+  background: var(--diary-ink);
+  color: #ffd22b;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.mini-turn-av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 2px solid var(--diary-ink);
+  color: #fff;
+}
+
+.turn-speech-copy {
+  line-height: 1.15;
+}
+
+#turn-player-name {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+}
+
+#turn-step-status {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--diary-ink-soft);
+}
+
+/* ============================================================================
+   CORNER & EDGE CIRCULAR CHARACTER MEDALLIONS (Reference Image 1!)
+   ============================================================================ */
+.player-medallions-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 35;
+}
+
+.player-medallion {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+}
+
+.player-medallion:hover {
+  transform: scale(1.07);
+}
+
+/* Corner / Edge Positions for up to 5 Players */
+.medallion-pos-0 { top: 18px; left: 22px; }
+.medallion-pos-1 { top: 18px; right: 22px; }
+.medallion-pos-2 { bottom: 150px; left: 22px; }
+.medallion-pos-3 { top: 44%; left: 18px; transform: translateY(-50%); }
+.medallion-pos-4 { top: 44%; right: 18px; transform: translateY(-50%); }
+
+.medallion-circle {
+  width: 98px;
+  height: 98px;
+  border-radius: 50%;
+  background: var(--medallion-bg, #5bc0be);
+  border: 6px solid var(--medallion-ring, #3a86ff);
+  box-shadow:
+    0 7px 0 rgba(0, 0, 0, 0.35),
+    inset 0 -6px 0 rgba(0, 0, 0, 0.16),
+    inset 0 4px 0 rgba(255, 255, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.player-medallion.active-medallion .medallion-circle {
+  box-shadow:
+    0 0 0 5px #ffd22b,
+    0 9px 0 rgba(0, 0, 0, 0.4),
+    0 0 28px rgba(255, 210, 43, 0.75);
+  animation: medallionPulse 1.6s ease-in-out infinite;
+}
+
+.player-medallion.inactive-medallion {
+  opacity: 0.86;
+}
+
+@keyframes medallionPulse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.medallion-bust-avatar {
+  font-size: 2.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.22));
+  margin-top: 4px;
+}
+
+.medallion-turn-flag {
+  position: absolute;
+  top: -10px;
+  background: #ffd22b;
+  color: var(--diary-ink);
+  border: 2.5px solid var(--diary-ink);
+  font-size: 0.65rem;
+  font-weight: 900;
+  padding: 1px 8px;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  z-index: 4;
+}
+
+.medallion-name-plate {
+  margin-top: -10px;
+  background: var(--diary-paper);
+  border: 3px solid var(--diary-ink);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.medallion-token-tag {
+  margin-top: 3px;
+  background: #ffd22b;
+  border: 2.5px solid var(--diary-ink);
+  border-radius: 999px;
+  padding: 1px 10px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================================================
+   3D ISOMETRIC ISLAND BOARD SCENE (Reference Image 1!)
+   ============================================================================ */
+/* ----------------------------------------------------------------------------
+   3D CAMERA (Rotate / Tilt / Zoom / Pan) — animatable custom properties
+   ---------------------------------------------------------------------------- */
+@property --cam-rot {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: -43deg;
+}
+@property --cam-tilt {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 54deg;
+}
+@property --cam-zoom {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --cam-pan-x {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+@property --cam-pan-y {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+.iso-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
+  z-index: 10;
+  touch-action: none;
+  cursor: grab;
+
+  /* Counter-rotation so pawns & props always stand upright facing the camera */
+  --billboard: rotateZ(calc(-1 * var(--cam-rot))) rotateX(calc(-1 * var(--cam-tilt)));
+  /* Direction of the extruded block walls (always "down" on screen, shrinks when viewed top-down) */
+  --tf: calc(sin(var(--cam-tilt)) / 0.809);
+  --ux: calc(sin(var(--cam-rot)) * var(--tf) * 1px);
+  --uy: calc(cos(var(--cam-rot)) * var(--tf) * 1px);
+
+  transition:
+    --cam-rot 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    --cam-tilt 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    --cam-zoom 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    --cam-pan-x 0.3s ease,
+    --cam-pan-y 0.3s ease;
+}
+
+.iso-viewport.cam-dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+#original-board-overlay {
+  position: absolute;
+  width: min(72vh, 82vw);
+  height: min(72vh, 82vw);
+  z-index: 60;
+  border-radius: 18px;
+  border: 5px solid var(--diary-ink);
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+}
+
+#original-board-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.overlay-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--diary-ink);
+  color: #fff;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.iso-scene {
+  position: relative;
+  width: min(63vh, 66vw);
+  height: min(63vh, 66vw);
+  min-width: 400px;
+  min-height: 400px;
+  transform:
+    translate(var(--cam-pan-x), var(--cam-pan-y))
+    translateY(-22px)
+    scale(var(--cam-zoom))
+    rotateX(var(--cam-tilt))
+    rotateZ(var(--cam-rot));
+  transform-style: preserve-3d;
+}
+
+/* Floating Grass & Earth Base Islands underneath the board blocks */
+.iso-under-island {
+  position: absolute;
+  border-radius: 26px;
+  pointer-events: none;
+}
+
+.island-main {
+  inset: -26px;
+  background: var(--grass-lime);
+  border: 4px solid #2b2738;
+  box-shadow:
+    calc(var(--ux) * 20) calc(var(--uy) * 20) 0 var(--earth-orange),
+    calc(var(--ux) * 28) calc(var(--uy) * 28) 0 #2b2738,
+    calc(var(--ux) * 42) calc(var(--uy) * 42) 0 rgba(0, 0, 0, 0.35);
+  transform: translateZ(-16px);
+}
+
+.island-north {
+  width: 110px;
+  height: 110px;
+  top: -70px;
+  left: 35%;
+  background: var(--grass-lime);
+  border: 3px solid #2b2738;
+  box-shadow:
+    calc(var(--ux) * 11) calc(var(--uy) * 11) 0 var(--earth-orange),
+    calc(var(--ux) * 17) calc(var(--uy) * 17) 0 #2b2738;
+  transform: translateZ(-20px);
+}
+
+.island-east {
+  width: 90px;
+  height: 90px;
+  bottom: -60px;
+  right: 20%;
+  background: #38d2e8;
+  border: 3px solid #2b2738;
+  box-shadow:
+    calc(var(--ux) * 11) calc(var(--uy) * 11) 0 #1694a8,
+    calc(var(--ux) * 17) calc(var(--uy) * 17) 0 #2b2738;
+  transform: translateZ(-20px);
+}
+
+.island-west {
+  width: 85px;
+  height: 85px;
+  top: 28%;
+  left: -68px;
+  background: #ffd22b;
+  border: 3px solid #2b2738;
+  box-shadow:
+    calc(var(--ux) * 11) calc(var(--uy) * 11) 0 #cca00a,
+    calc(var(--ux) * 17) calc(var(--uy) * 17) 0 #2b2738;
+  transform: translateZ(-20px);
+}
+
+/* 9x9 Isometric Grid */
+.iso-board-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1.38fr repeat(7, 1fr) 1.38fr;
+  grid-template-rows: 1.38fr repeat(7, 1fr) 1.38fr;
+  gap: 5px;
+  transform-style: preserve-3d;
+}
+
+/* 3D Chunky Isometric Cube Block Tiles */
+.board-tile {
+  position: relative;
+  border-radius: 6px;
+  border: 2.5px solid #2b2738;
+  background: var(--tile-cream-top);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  /* 3D Isometric Extruded Block Depth toward bottom-left (-X, +Y in rotated space) */
+  box-shadow:
+    calc(var(--ux) * 4) calc(var(--uy) * 4) 0 var(--wall-color, #bda67e),
+    calc(var(--ux) * 8) calc(var(--uy) * 8) 0 var(--wall-color, #bda67e),
+    calc(var(--ux) * 12) calc(var(--uy) * 12) 0 var(--wall-color, #bda67e),
+    calc(var(--ux) * 15) calc(var(--uy) * 15) 0 #2b2738,
+    calc(var(--ux) * 21) calc(var(--uy) * 21) 4px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+  cursor: pointer;
+}
+
+.board-tile:hover {
+  transform: translateZ(10px);
+  filter: brightness(1.08);
+}
+
+/* Color Block Themes matching Reference Image 1 + board.jpg */
+.board-tile.color-red {
+  background: var(--tile-red-top);
+  --wall-color: var(--tile-red-wall);
+}
+
+.board-tile.color-blue {
+  background: var(--tile-blue-top);
+  --wall-color: var(--tile-blue-wall);
+}
+
+.board-tile.color-green {
+  background: var(--tile-green-top);
+  --wall-color: var(--tile-green-wall);
+}
+
+.board-tile.color-yellow {
+  background: var(--tile-yellow-top);
+  --wall-color: var(--tile-yellow-wall);
+}
+
+.board-tile.tile-start {
+  background: #f7e6c4;
+  --wall-color: #c89d66;
+}
+
+.board-tile.tile-bonus {
+  background: linear-gradient(135deg, #7ae582, #52b788);
+  --wall-color: #f3722c;
+  transform: translateZ(6px);
+}
+
+.board-tile.tile-step-glow {
+  background: #ffffff !important;
+  transform: translateZ(18px) !important;
+  box-shadow:
+    calc(var(--ux) * 6) calc(var(--uy) * 6) 0 #ffd22b,
+    calc(var(--ux) * 12) calc(var(--uy) * 12) 0 #f3722c,
+    calc(var(--ux) * 17) calc(var(--uy) * 17) 0 #2b2738,
+    0 0 26px #ffd22b !important;
+  z-index: 30;
+}
+
+.board-tile.tile-active-highlight {
+  outline: 3.5px solid #ffffff;
+  z-index: 25;
+}
+
+.tile-inner-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.tile-step-num {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: rgba(43, 39, 56, 0.65);
+  line-height: 1;
+}
+
+.tile-cat-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+/* Floating Speech-Bubble "START!" Sign like Reference Image 1 */
+.corner-label {
+  font-family: var(--font-pixel);
+  font-weight: 800;
+  font-size: 0.72rem;
+  color: #2b2738;
+  background: #ffffff;
+  border: 2.5px solid #2b2738;
+  padding: 2px 7px;
+  border-radius: 999px;
+  box-shadow: -3px 3px 0 rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+
+.bonus-star-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #2b2738;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+}
+
+/* ============================================================================
+   3D UPRIGHT MATRYOSHKA / TOTEM PAWNS STANDING ON BLOCKS (Reference Image 1!)
+   ============================================================================ */
+.tile-pawns-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.board-pawn {
+  width: 34px;
+  height: 44px;
+  border-radius: 17px 17px 12px 12px;
+  border: 3px solid #2b2738;
+  background: var(--pawn-color, #e11d48);
+  box-shadow:
+    inset 0 -6px 0 rgba(0, 0, 0, 0.25),
+    inset 0 3px 0 rgba(255, 255, 255, 0.45),
+    0 6px 8px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Counter-rotate so the pawn stands upright facing the camera in 3D space! */
+  transform: var(--billboard) translateY(-18px);
+  transform-origin: bottom center;
+  animation: pawnStandPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.board-pawn span {
+  font-size: 18px;
+  line-height: 1;
+  background: #fcf3e3;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #2b2738;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-pawn.current-pawn {
+  box-shadow:
+    0 0 0 3px #ffd22b,
+    inset 0 -6px 0 rgba(0, 0, 0, 0.25),
+    0 10px 16px rgba(0, 0, 0, 0.55);
+  animation: pawnBounce3D 1.1s ease-in-out infinite;
+  z-index: 50;
+}
+
+@keyframes pawnStandPop {
+  0% {
+    transform: var(--billboard) translateY(-48px) scale(0.6);
+  }
+  100% {
+    transform: var(--billboard) translateY(-18px) scale(1);
+  }
+}
+
+@keyframes pawnBounce3D {
+  0%, 100% {
+    transform: var(--billboard) translateY(-18px) scale(1.1);
+  }
+  50% {
+    transform: var(--billboard) translateY(-30px) scale(1.16);
+  }
+}
+
+/* ============================================================================
+   CENTER LAGOON ISLAND INSIDE THE 9x9 LOOP
+   ============================================================================ */
+.iso-center-island {
+  grid-row: 2 / 9;
+  grid-column: 2 / 9;
+  background: radial-gradient(circle at 50% 50%, #95f279 0%, #6dd65a 75%, #4eb857 100%);
+  border: 3.5px solid #2b2738;
+  border-radius: 14px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  transform-style: preserve-3d;
+  box-shadow: inset -8px 8px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Cyan Water Pond with Octopus like Reference Image 1 */
+.iso-pond-water {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  width: 92px;
+  height: 54px;
+  background: #2ec4f1;
+  border: 3px solid #2b2738;
+  border-radius: 12px;
+  box-shadow: inset -4px 4px 0 #1594bd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pond-octopus {
+  font-size: 1.55rem;
+  display: inline-block;
+  transform: var(--billboard);
+}
+
+/* Standing 3D Island Props */
+.iso-prop {
+  position: absolute;
+  font-size: 2rem;
+  transform: var(--billboard) translateY(-12px);
+  transform-origin: bottom center;
+  filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 0.3));
+  pointer-events: none;
+}
+
+.prop-mountain { top: 8px; right: 16px; font-size: 2.3rem; }
+.prop-bear { top: -8px; right: 56px; font-size: 1.7rem; }
+.prop-windmill { bottom: 10px; right: 14px; font-size: 2rem; }
+.prop-tree-1 { bottom: 14px; left: 16px; font-size: 1.9rem; }
+.prop-tree-2 { top: 45%; left: 10px; font-size: 1.75rem; }
+
+/* 4 Stacked Card Decks in the Center Island */
+.iso-decks-cluster {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 88%;
+  max-width: 340px;
+  margin-top: 42px;
+  z-index: 5;
+  transform-style: preserve-3d;
+}
+
+.center-deck-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+.center-deck-card {
+  width: 100%;
+  aspect-ratio: 2 / 2.8;
+  border-radius: 8px;
+  border: 2.5px solid #2b2738;
+  overflow: hidden;
+  position: relative;
+  background: #fff;
+  box-shadow:
+    calc(var(--ux) * 4) calc(var(--uy) * 4) 0 #fcf3e3,
+    calc(var(--ux) * 8) calc(var(--uy) * 8) 0 #2b2738,
+    calc(var(--ux) * 14) calc(var(--uy) * 14) 8px rgba(0, 0, 0, 0.32);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.center-deck-card:hover {
+  transform: translateZ(16px) scale(1.07);
+}
+
+.center-deck-card.deck-drawing-pulse {
+  animation: deckJump3D 0.45s ease-in-out 2;
+}
+
+@keyframes deckJump3D {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translateZ(28px) scale(1.12); }
+}
+
+.center-deck-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.deck-count-pill {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  background: #2b2738;
+  color: #ffd22b;
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 99px;
+}
+
+.deck-mini-tag {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #2b2738;
+  background: #ffffff;
+  border: 2px solid #2b2738;
+  padding: 1px 6px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* Center Wooden/Cream Signpost */
+.iso-center-sign {
+  background: #fcf3e3;
+  border: 3px solid #2b2738;
+  border-radius: 12px;
+  padding: 5px 14px;
+  text-align: center;
+  box-shadow:
+    calc(var(--ux) * 6) calc(var(--uy) * 6) 0 #c89d66,
+    calc(var(--ux) * 10) calc(var(--uy) * 10) 0 #2b2738;
+  z-index: 5;
+  margin-bottom: 4px;
+}
+
+.sign-en {
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #2b2738;
+}
+
+.sign-th {
+  font-family: var(--font-hand);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #c83e20;
+}
+
+/* ============================================================================
+   TRAMPOLINE DICE STATION (Bottom-Center, Exact Match to Reference Image 1!)
+   ============================================================================ */
+.trampoline-dice-station {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 45;
+}
+
+/* 3D Isometric Cube Die jumping above the trampoline */
+.d4-jumping-cube {
+  width: 62px;
+  height: 62px;
+  background: #fcf3e3;
+  border: 3.5px solid #2b2738;
+  border-radius: 14px;
+  box-shadow:
+    inset -6px -6px 0 #d8c8b0,
+    inset 4px 4px 0 #ffffff,
+    0 10px 14px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+  margin-bottom: -12px;
+  transform: rotate(-8deg);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.trampoline-dice-station:hover .d4-jumping-cube {
+  transform: translateY(-10px) rotate(6deg) scale(1.08);
+}
+
+.d4-jumping-cube.rolling {
+  animation: trampolineBounceDie 0.48s infinite cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
+@keyframes trampolineBounceDie {
+  0%, 100% {
+    transform: translateY(4px) scale(1.12, 0.85) rotate(0deg);
+  }
+  45% {
+    transform: translateY(-58px) scale(0.95, 1.08) rotate(180deg);
+  }
+  55% {
+    transform: translateY(-62px) scale(1, 1) rotate(220deg);
+  }
+}
+
+.cube-dots {
+  font-size: 0.55rem;
+  color: #6b5b7b;
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+.d4-number {
+  font-family: var(--font-pixel);
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #c83e20;
+  line-height: 1;
+}
+
+/* Orange-Rimmed Purple Trampoline Pad (Reference Image 1) */
+.trampoline-pad {
+  width: 112px;
+  height: 68px;
+  background: #f3722c;
+  border: 3.5px solid #2b2738;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow:
+    0 7px 0 #ba4a12,
+    0 11px 0 #2b2738,
+    0 16px 20px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.trampoline-mat {
+  width: 100%;
+  height: 100%;
+  background: #5b5275;
+  border: 2.5px solid #2b2738;
+  border-radius: 50%;
+  box-shadow: inset 0 5px 0 rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trampoline-hint {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.trampoline-cta-pill {
+  margin-top: 8px;
+  background: #7ae582;
+  color: #2b2738;
+  border: 3px solid #2b2738;
+  border-radius: 999px;
+  padding: 5px 16px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #3a8c40, 0 7px 0 #2b2738;
+  transition: transform 0.14s ease;
+}
+
+.trampoline-cta-pill:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.trampoline-cta-pill:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   BOTTOM DOCKS & CHUNKY ROUND ARCADE BUTTONS (Reference Image 1!)
+   ============================================================================ */
+.bottom-left-dock {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.dock-buttons-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 3D Camera Control Bar */
+.camera-control-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--diary-paper);
+  border: 3px solid var(--diary-ink);
+  border-radius: 14px;
+  padding: 4px 6px;
+  box-shadow: 0 5px 0 var(--diary-cover-dark), 0 8px 14px rgba(0, 0, 0, 0.35);
+}
+
+.cam-btn {
+  min-width: 32px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 9px;
+  border: 2px solid var(--diary-ink);
+  background: #ffffff;
+  color: var(--diary-ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.cam-btn:hover {
+  background: #ffd22b;
+  transform: translateY(-2px);
+}
+
+.cam-btn:active {
+  transform: translateY(1px);
+}
+
+.cam-reset-btn {
+  background: #7ae582;
+}
+
+.cam-zoom-readout {
+  min-width: 44px;
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+}
+
+.cam-hint {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  padding-left: 4px;
+}
+
+.dock-diary-btn {
+  background: var(--diary-paper);
+  color: var(--diary-ink);
+  border: 3px solid var(--diary-ink);
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 5px 0 var(--diary-cover-dark), 0 8px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.dock-diary-btn:hover {
+  transform: translateY(-3px);
+}
+
+.bottom-right-round-controls {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.round-arcade-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3.5px solid #2b2738;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.22),
+    0 5px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.round-arcade-btn:hover {
+  transform: translateY(-4px) scale(1.06);
+}
+
+.round-arcade-btn:active {
+  transform: translateY(2px);
+}
+
+.btn-cyan { background: #2ec4f1; color: #ffffff; }
+.btn-teal { background: #7ae582; color: #2b2738; }
+.btn-yellow { background: #ffd22b; color: #2b2738; }
+.btn-purple { background: #b565f7; color: #ffffff; }
+.btn-pink { background: #ff477e; color: #ffffff; }
+
+.round-arcade-btn.muted {
+  filter: grayscale(0.8);
+  opacity: 0.65;
+}
+
+/* ============================================================================
+   PART 2: COZY OPEN-BOOK DIARY UI MODALS (Exact Match to Reference Image 2!)
+   ============================================================================ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 41, 0.76);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Graph-Paper Outer Frame with Corner Mounts (Reference Image 2) */
+.diary-graph-frame {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  max-height: 94vh;
+  overflow-y: auto;
+  background-color: var(--diary-graph-bg);
+  background-image:
+    linear-gradient(to right, rgba(196, 154, 132, 0.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(196, 154, 132, 0.16) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border: 4px solid var(--diary-ink);
+  border-radius: 22px;
+  padding: 22px 34px 20px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+.compact-diary-frame {
+  max-width: 560px;
+}
+
+/* Brown Corner Photo Mount Brackets */
+.corner-bracket {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--diary-ink);
+  pointer-events: none;
+}
+.cb-tl { top: 0; left: 0; border-bottom-right-radius: 18px; }
+.cb-tr { top: 0; right: 0; border-bottom-left-radius: 18px; }
+.cb-bl { bottom: 0; left: 0; border-top-right-radius: 18px; }
+.cb-br { bottom: 0; right: 0; border-top-left-radius: 18px; }
+
+/* Top Wooden/Leather Plaque Banner */
+.diary-top-wood-plaque {
+  max-width: 520px;
+  margin: 0 auto 14px;
+  background: var(--diary-cover);
+  border: 3px solid var(--diary-ink);
+  border-radius: 12px;
+  padding: 7px 22px;
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--diary-ink);
+  position: relative;
+  box-shadow: 0 4px 0 rgba(90, 58, 49, 0.22);
+}
+
+.diary-top-wood-plaque::before,
+.diary-top-wood-plaque::after {
+  content: '•';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+.diary-top-wood-plaque::before { left: 10px; }
+.diary-top-wood-plaque::after { right: 10px; }
+
+/* Open Leather Book Wrapper */
+.diary-book-wrapper {
+  position: relative;
+  background: var(--diary-cover);
+  border: 3.5px solid var(--diary-ink);
+  border-radius: 22px;
+  padding: 16px 18px;
+  box-shadow:
+    inset 0 0 0 4px #b38874,
+    0 12px 0 rgba(90, 58, 49, 0.25);
+}
+
+/* Left Leather Clasp & Dangling Key (Reference Image 2!) */
+.diary-left-clasp {
+  position: absolute;
+  left: -26px;
+  top: 48%;
+  width: 34px;
+  height: 76px;
+  background: var(--diary-cover);
+  border: 3px solid var(--diary-ink);
+  border-radius: 12px 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.clasp-button {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--diary-ink);
+  border: 2px solid #e6c6b3;
+}
+
+.dangling-key {
+  position: absolute;
+  bottom: -34px;
+  left: 2px;
+  font-size: 1.55rem;
+  transform: rotate(-15deg);
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.2));
+}
+
+/* Paperclipped Top Title Tab (PROFILE / PARTY SETUP / MISSION) */
+.diary-paperclip-tab {
+  position: absolute;
+  top: -18px;
+  left: 42px;
+  background: var(--diary-paper-alt);
+  border: 3px solid var(--diary-ink);
+  border-radius: 10px;
+  padding: 4px 24px 4px 16px;
+  font-family: var(--font-pixel);
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  transform: rotate(-2deg);
+  box-shadow: 0 4px 0 rgba(90, 58, 49, 0.2);
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Close Circle Button on Top-Right of Book */
+.diary-close-circle {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--diary-cover);
+  border: 3px solid var(--diary-ink);
+  color: var(--diary-ink);
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 4px 0 rgba(90, 58, 49, 0.28);
+}
+
+.diary-close-circle:hover {
+  background: #ff8fa3;
+}
+
+/* Left & Right Bookmark Tabs sticking out of the book */
+.diary-left-tabs {
+  position: absolute;
+  left: -20px;
+  top: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.l-player-tab {
+  width: 32px;
+  height: 36px;
+  border-radius: 8px 0 0 8px;
+  border: 2.5px solid var(--diary-ink);
+  background: #f7e6c4;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.l-player-tab.active {
+  transform: translateX(-6px);
+  background: #ffd22b;
+}
+
+.diary-right-tabs {
+  position: absolute;
+  right: -24px;
+  top: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 2;
+}
+
+.r-tab {
+  width: 36px;
+  height: 44px;
+  border-radius: 0 10px 10px 0;
+  border: 2.5px solid var(--diary-ink);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.r-tab:hover {
+  transform: translateX(4px);
+}
+.tab-gold { background: #ffc971; }
+.tab-pink { background: #ff9ebb; }
+.tab-blue { background: #a8dadc; }
+
+/* Two-Page Open Spread */
+.diary-pages-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--diary-paper);
+  border: 3px solid var(--diary-ink);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  z-index: 6;
+}
+
+@media (max-width: 780px) {
+  .diary-pages-spread {
+    grid-template-columns: 1fr;
+  }
+}
+
+.diary-page {
+  padding: 22px 20px 18px;
+  background: var(--diary-paper);
+}
+
+.page-left {
+  border-right: 2.5px dashed rgba(90, 58, 49, 0.35);
+}
+
+.diary-single-page {
+  background: var(--diary-paper);
+  border: 3px solid var(--diary-ink);
+  border-radius: 18px;
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.wide-single-page {
+  text-align: left;
+}
+
+/* Profile Card on Left Page (Reference Image 2) */
+.diary-profile-card {
+  position: relative;
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+  outline: 2px dashed rgba(90, 58, 49, 0.25);
+  outline-offset: -7px;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.profile-ribbon {
+  position: absolute;
+  top: -4px;
+  right: 18px;
+  background: #ffccd5;
+  border: 2px solid var(--diary-ink);
+  color: #d90429;
+  padding: 4px 7px 8px;
+  font-size: 0.75rem;
+  border-radius: 0 0 6px 6px;
+}
+
+.profile-avatar-circle {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: #e9d8c4;
+  border: 3px solid var(--diary-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-family: var(--font-pixel);
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+}
+
+.profile-handle {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--diary-ink-soft);
+  margin-bottom: 4px;
+}
+
+.profile-bio {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--diary-ink);
+  line-height: 1.35;
+}
+
+/* Likes / Friends / Tokens Strip */
+.diary-social-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.social-metric {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.sm-icon {
+  font-size: 1.2rem;
+}
+
+.sm-val {
+  font-family: var(--font-pixel);
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.sm-lbl {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--diary-ink-soft);
+}
+
+/* Meta Info Box (LV, AGE, STATUS) */
+.diary-meta-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  margin-bottom: 12px;
+}
+
+.meta-pair {
+  display: flex;
+  justify-content: space-between;
+}
+
+.meta-pair span {
+  font-weight: 800;
+  color: var(--diary-ink-soft);
+}
+
+.diary-section-heading {
+  font-family: var(--font-pixel);
+  font-size: 0.84rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+/* 5 Collected Wellbeing Badges Row (FAVORITE ITEMS in Reference Image 2) */
+.diary-items-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.diary-item-slot {
+  aspect-ratio: 1 / 1.1;
+  background: var(--diary-paper);
+  border: 2px solid var(--diary-ink);
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.item-emoji {
+  font-size: 1.35rem;
+}
+
+.item-count {
+  font-family: var(--font-pixel);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+/* Segmented STATS Bars on Right Page (Exact Match to Reference Image 2!) */
+.diary-stats-box {
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.stat-bar-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 34px;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-label {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.stat-segments-track {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  height: 15px;
+  border: 2px solid var(--diary-ink);
+  border-radius: 999px;
+  overflow: hidden;
+  background: #8d6e63;
+}
+
+.stat-seg {
+  border-right: 1.5px solid rgba(90, 58, 49, 0.45);
+  height: 100%;
+}
+.stat-seg:last-child {
+  border-right: none;
+}
+
+.stat-num {
+  font-family: var(--font-pixel);
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: var(--diary-ink-soft);
+  text-align: right;
+}
+
+/* Recent Activity List (Reference Image 2) */
+.diary-activity-list {
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 175px;
+  overflow-y: auto;
+}
+
+.activity-item-card {
+  background: var(--diary-paper);
+  border: 1.5px dashed var(--diary-ink-soft);
+  border-radius: 10px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.act-left {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.act-badge {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: var(--diary-ink-soft);
+}
+
+/* Bottom Navigation Arrows (`◄ PREVIOUS` / `NEXT ►`) */
+.diary-bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 520px;
+  margin: 12px auto 0;
+}
+
+.diary-nav-arrow {
+  background: transparent;
+  border: none;
+  font-family: var(--font-pixel);
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  cursor: pointer;
+  padding: 4px 10px;
+}
+
+.diary-nav-arrow:hover {
+  color: #c83e20;
+  transform: scale(1.05);
+}
+
+/* ============================================================================
+   PARTY SETUP & MISSION CARD INSIDE THE DIARY SPREAD
+   ============================================================================ */
+.player-count-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.player-count-btn {
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 2.5px solid var(--diary-ink);
+  background: var(--diary-graph-bg);
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-count-btn .pc-num {
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: var(--diary-ink);
+}
+
+.player-count-btn .pc-sub {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--diary-ink-soft);
+}
+
+.player-count-btn.active {
+  background: #ffd22b;
+  box-shadow: 0 4px 0 var(--diary-ink);
+}
+
+.diary-note-callout {
+  background: var(--diary-graph-bg);
+  border: 2px dashed var(--diary-ink);
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--diary-ink);
+}
+
+.diary-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.diary-volume-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.diary-quick-links {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.diary-action-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 2.5px solid var(--diary-ink);
+  background: var(--diary-cover);
+  color: var(--diary-ink);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.diary-action-btn.secondary {
+  background: var(--diary-graph-bg);
+}
+
+.diary-action-btn:hover {
+  background: #ffd22b;
+}
+
+.setup-players-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 12px;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.setup-player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--diary-graph-bg);
+  border: 2px solid var(--diary-ink);
+  border-left: 6px solid #e11d48;
+  border-radius: 12px;
+  padding: 7px 10px;
+}
+
+.setup-player-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--diary-ink);
+  flex-shrink: 0;
+}
+
+.setup-player-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+}
+
+.setup-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setup-field-group label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--diary-ink-soft);
+}
+
+.setup-name-input,
+.setup-age-input {
+  padding: 4px 8px;
+  border-radius: 7px;
+  border: 2px solid var(--diary-ink);
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.setup-name-input { width: 115px; }
+.setup-age-input { width: 56px; }
+
+.avatar-picker-row {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.avatar-pick-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.avatar-pick-btn.selected {
+  border: 2px solid var(--diary-ink);
+  background: #ffd22b;
+  transform: scale(1.1);
+}
+
+.diary-start-cta {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 3px solid var(--diary-ink);
+  background: #7ae582;
+  color: var(--diary-ink);
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--diary-ink);
+  transition: transform 0.14s ease;
+}
+
+.diary-start-cta:hover {
+  transform: translateY(-2px);
+  background: #8cf294;
+}
+
+/* ============================================================================
+   3D MISSION CARD SHOWCASE INSIDE DIARY MODAL
+   ============================================================================ */
+.card-left-showcase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-3d-stage {
+  perspective: 1100px;
+  width: 245px;
+  height: 375px;
+  cursor: pointer;
+}
+
+.card-flip-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.72s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 3.5px solid var(--diary-ink);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+}
+
+.card-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-face-front {
+  transform: rotateY(180deg);
+}
+
+.card-text-overlay {
+  position: absolute;
+  inset: 14% 12% 13% 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 6px;
+  font-family: var(--font-hand);
+}
+
+#card-mission-title {
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.25;
+  margin-bottom: 14px;
+}
+
+#card-mission-tiers-text {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 14px;
+}
+
+#card-mission-penalty-text {
+  font-size: 1.04rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.card-secret-cover {
+  position: absolute;
+  inset: 12% 10% 11% 10%;
+  background: rgba(58, 46, 57, 0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  border: 2.5px solid #ffd22b;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  text-align: center;
+  z-index: 5;
+}
+
+.secret-lock-icon { font-size: 2.2rem; margin-bottom: 6px; }
+.secret-lock-title { font-size: 0.95rem; font-weight: 800; color: #ffd22b; }
+.secret-lock-sub { font-size: 0.74rem; color: #f1f5f9; margin-top: 4px; }
+
+.card-flip-caption {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--diary-ink-soft);
+  margin-top: 8px;
+}
+
+.diary-card-player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--diary-graph-bg);
+  border: 2px solid var(--diary-ink);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+}
+
+.diary-rule-callout {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 2px solid var(--diary-ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.friend-reader-box {
+  background: #fffbeb;
+  border: 2px dashed var(--diary-ink);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+
+#friend-reader-status {
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.friend-reader-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.friend-reader-btn {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 2px solid var(--diary-ink);
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.friend-reader-btn.selected {
+  background: #ffd22b;
+}
+
+.card-tools-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.tool-mini-btn {
+  padding: 4px 9px;
+  border-radius: 8px;
+  border: 2px solid var(--diary-ink);
+  background: var(--diary-graph-bg);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--diary-ink);
+  cursor: pointer;
+}
+
+.tool-mini-btn:hover {
+  background: #ffd22b;
+}
+
+#mission-timer-display {
+  font-weight: 900;
+  color: #c83e20;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  background: #ffd22b;
+  border: 2px solid var(--diary-ink);
+  border-radius: 8px;
+}
+
+.modal-tier-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.tier-choice-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 2.5px solid var(--diary-ink);
+  background: var(--diary-graph-bg);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--diary-ink);
+  cursor: pointer;
+  box-shadow: 0 3px 0 rgba(90, 58, 49, 0.2);
+  transition: transform 0.12s ease;
+}
+
+.tier-choice-btn:hover {
+  transform: translateX(4px);
+  background: #d8f3dc;
+}
+
+.tier-btn-reward {
+  background: #ffd22b;
+  border: 2px solid var(--diary-ink);
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-weight: 900;
+}
+
+.tier-skip-btn {
+  background: #ffe5ec;
+}
+.tier-skip-btn:hover {
+  background: #ffccd5;
+}
+
+.tier-btn-penalty {
+  background: #ff6b4a;
+  color: #fff;
+  border: 2px solid var(--diary-ink);
+  padding: 2px 9px;
+  border-radius: 99px;
+  font-weight: 900;
+}
+
+/* Bonus & Victory Inside Diary */
+.bonus-hero-name {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--diary-ink);
+  margin-bottom: 4px;
+}
+
+.bonus-desc {
+  font-size: 0.85rem;
+  color: var(--diary-ink-soft);
+  line-height: 1.45;
+}
+
+.bonus-die-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 22px;
+  background: #ffd22b;
+  border: 3.5px solid var(--diary-ink);
+  color: var(--diary-ink);
+  font-family: var(--font-pixel);
+  font-size: 2.8rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 14px auto;
+  box-shadow: 0 7px 0 var(--diary-ink);
+}
+
+.bonus-die-circle.rolling {
+  animation: trampolineBounceDie 0.42s infinite;
+}
+
+.bonus-status-msg {
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.victory-rankings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+  text-align: left;
+}
+
+.victory-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--diary-graph-bg);
+  border: 2.5px solid var(--diary-ink);
+}
+
+.victory-rank-row.is-winner-row {
+  background: #fff3b0;
+  box-shadow: 0 4px 0 var(--diary-ink);
+}
+
+.rank-medal { font-size: 1.5rem; }
+.rank-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--diary-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+}
+.rank-details { flex: 1; }
+.rank-name { font-weight: 900; font-size: 0.95rem; }
+.rank-age { font-size: 0.75rem; color: var(--diary-ink-soft); }
+.rank-wellbeing-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+.rank-tokens-badge {
+  background: #ffd22b;
+  border: 2px solid var(--diary-ink);
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-weight: 900;
+}
+
+/* Card Editor & Rules Inside Diary */
+.editor-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.editor-cat-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.editor-cat-tab {
+  padding: 6px 12px;
+  border-radius: 99px;
+  border: 2.5px solid var(--diary-ink);
+  background: var(--diary-graph-bg);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.editor-cat-tab.active {
+  background: #ffd22b;
+}
+
+.editor-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+  gap: 10px;
+  max-height: 48vh;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.editor-card-item {
+  background: var(--diary-graph-bg);
+  border: 2px solid var(--diary-ink);
+  border-radius: 12px;
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.editor-card-num { font-weight: 900; font-size: 0.78rem; }
+.editor-card-item label { font-size: 0.65rem; font-weight: 800; color: var(--diary-ink-soft); }
+.editor-card-item input {
+  padding: 4px 7px;
+  border-radius: 6px;
+  border: 1.5px solid var(--diary-ink);
+  font-family: inherit;
+  font-size: 0.78rem;
+}
+
+.editor-footer-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 10px;
+}
+
+#bulk-paste-textarea {
+  width: 100%;
+  height: 220px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2.5px solid var(--diary-ink);
+  font-family: monospace;
+  font-size: 0.82rem;
+}
+
+.diary-rule-box {
+  background: var(--diary-graph-bg);
+  border: 2px solid var(--diary-ink);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* Floating Toast */
+#game-toast {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--diary-paper);
+  color: var(--diary-ink);
+  border: 3px solid var(--diary-ink);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2500;
+  text-align: center;
+  max-width: 90vw;
+}
+
+#game-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

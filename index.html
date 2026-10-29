@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BATTLE OF WELLBEING • ศึกชิงสุขภาพดี</title>
+  <!-- Pixel & Cozy Handcrafted Fonts (with offline fallbacks) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800;900&family=Mali:wght@600;700&family=Silkscreen:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Full-screen Canvas for Visual Effects, Confetti, Shockwaves & Flying Tokens -->
+  <canvas id="fx-canvas"></canvas>
+
+  <!-- ========================================================================
+       MAIN SCREEN: 3D ISOMETRIC ISLAND BOARD GAME (Inspired by Reference 1)
+       ======================================================================== -->
+  <div class="ocean-world-stage">
+    <!-- Animated Ocean Ripples & Floating Pixel/Vector Sea Details -->
+    <div class="ocean-waves-layer" aria-hidden="true">
+      <span class="wave-mark" style="top:14%; left:18%;">﹏﹏</span>
+      <span class="wave-mark" style="top:24%; left:82%;">﹏</span>
+      <span class="wave-mark" style="top:68%; left:8%;">﹏﹏</span>
+      <span class="wave-mark" style="top:78%; left:86%;">﹏﹏</span>
+      <span class="wave-mark" style="top:46%; left:12%;">﹏</span>
+      <span class="wave-mark" style="top:88%; left:42%;">﹏﹏</span>
+      <span class="lily-pad" style="top:32%; left:14%;">🍀</span>
+      <span class="lily-pad" style="top:62%; left:84%;">🌿</span>
+      <span class="lily-pad" style="top:18%; left:68%;">🌱</span>
+    </div>
+
+    <!-- Top-Center Compact Turn & Treasury Banner -->
+    <div class="top-floating-hud">
+      <div class="hud-treasury-pill" id="central-bank-box" title="โทเคนกองกลาง (หมดกองกลาง = จบเกม)">
+        <span class="treasury-icon">🏦</span>
+        <div class="treasury-text">
+          <span class="treasury-label">กองกลาง</span>
+          <span class="treasury-val"><b id="central-pool-count">24</b>/<span id="central-pool-max">30</span> 🪙</span>
+        </div>
+        <div class="treasury-mini-bar">
+          <div id="central-pool-bar"></div>
+        </div>
+      </div>
+
+      <div class="hud-turn-speech" id="current-turn-banner">
+        <span class="turn-round-tag" id="turn-round-pill">รอบที่ 1</span>
+        <span id="turn-player-avatar" class="mini-turn-av">🦁</span>
+        <div class="turn-speech-copy">
+          <div id="turn-player-name">ผู้เล่น 1</div>
+          <div id="turn-step-status">คลิกที่แท่นแทรมโพลีนเพื่อทอยลูกเต๋า!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corner & Edge Circular Character Portrait Medallions (3 to 5 Players) -->
+    <div id="player-medallions-layer" class="player-medallions-layer"></div>
+
+    <!-- 3D ISOMETRIC ISLAND BOARD VIEWPORT -->
+    <div class="iso-viewport">
+      <!-- Optional Original board.jpg Reference Overlay -->
+      <div id="original-board-overlay" class="hidden">
+        <img src="assets/board.jpg" alt="Original Board Reference" />
+        <div class="overlay-badge">ภาพกระดานต้นฉบับ (กดปุ่ม 🖼️ มุมขวาล่างเพื่อปิด)</div>
+      </div>
+
+      <div class="iso-scene" id="iso-scene">
+        <!-- Decorative Outer Grass & Water Islands under the board -->
+        <div class="iso-under-island island-main"></div>
+        <div class="iso-under-island island-north"></div>
+        <div class="iso-under-island island-east"></div>
+        <div class="iso-under-island island-west"></div>
+
+        <!-- 9x9 Isometric Board Grid (32 Perimeter Cube Tiles + Center Lagoon Island) -->
+        <div id="board-grid" class="iso-board-grid">
+          <!-- Center Island Playmat (Rows 2..8, Cols 2..8) -->
+          <div class="iso-center-island">
+            <div class="iso-pond-water">
+              <span class="pond-octopus">🐙</span>
+            </div>
+
+            <!-- Decorative 3D Isometric Props (Stand upright in 3D space) -->
+            <div class="iso-prop prop-mountain" title="ภูเขาสุขภาพดี">⛰️</div>
+            <div class="iso-prop prop-windmill" title="กังหันลมพลังงานบวก">🛖</div>
+            <div class="iso-prop prop-tree-1">🌳</div>
+            <div class="iso-prop prop-tree-2">🌲</div>
+            <div class="iso-prop prop-bear">🐻‍❄️</div>
+
+            <!-- 4 Stacked Wellbeing Card Decks on the Center Island -->
+            <div class="iso-decks-cluster">
+              <div class="center-deck-slot" data-cat="red" title="กองการ์ดแข็งแรง (สีแดง)">
+                <div class="center-deck-card" id="deck-stack-red">
+                  <img src="assets/red_back.jpg" alt="การ์ดแข็งแรง" />
+                  <span class="deck-count-pill" id="deck-count-red">10</span>
+                </div>
+                <span class="deck-mini-tag red-tag">แข็งแรง</span>
+              </div>
+
+              <div class="center-deck-slot" data-cat="blue" title="กองการ์ดอารมณ์ดี (สีฟ้า)">
+                <div class="center-deck-card" id="deck-stack-blue">
+                  <img src="assets/blue_back.jpg" alt="การ์ดอารมณ์ดี" />
+                  <span class="deck-count-pill" id="deck-count-blue">10</span>
+                </div>
+                <span class="deck-mini-tag blue-tag">อารมณ์ดี</span>
+              </div>
+
+              <div class="center-deck-slot" data-cat="green" title="กองการ์ดเพื่อนเยอะ (สีเขียว)">
+                <div class="center-deck-card" id="deck-stack-green">
+                  <img src="assets/green_back.jpg" alt="การ์ดเพื่อนเยอะ" />
+                  <span class="deck-count-pill" id="deck-count-green">10</span>
+                </div>
+                <span class="deck-mini-tag green-tag">เพื่อนเยอะ</span>
+              </div>
+
+              <div class="center-deck-slot" data-cat="yellow" title="กองการ์ดมีเป้าหมาย (สีเหลือง)">
+                <div class="center-deck-card" id="deck-stack-yellow">
+                  <img src="assets/yellow_back.jpg" alt="การ์ดมีเป้าหมาย" />
+                  <span class="deck-count-pill" id="deck-count-yellow">10</span>
+                </div>
+                <span class="deck-mini-tag yellow-tag">มีเป้าหมาย</span>
+              </div>
+            </div>
+
+            <!-- Center Title Banner -->
+            <div class="iso-center-sign">
+              <div class="sign-en">BATTLE OF WELLBEING</div>
+              <div class="sign-th">ศึกชิงสุขภาพดี</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAMPOLINE DICE PAD (Bottom-Center, just like Reference Image 1!) -->
+      <div class="trampoline-dice-station" id="d4-3d-wrapper" title="คลิกหรือกด Spacebar เพื่อทอยลูกเต๋า 4 หน้า!">
+        <div class="d4-jumping-cube" id="d4-pyramid">
+          <div class="cube-face-top">
+            <span class="cube-dots">• •</span>
+          </div>
+          <div class="cube-face-front">
+            <span class="d4-number" id="d4-number-display">4</span>
+          </div>
+          <div class="cube-face-side">
+            <span class="cube-dots">• • •</span>
+          </div>
+        </div>
+        <div class="trampoline-pad" id="trampoline-pad">
+          <div class="trampoline-mat">
+            <span class="trampoline-hint">คลิกทอย (1–4)</span>
+          </div>
+          <div class="trampoline-legs"></div>
+        </div>
+        <button type="button" id="roll-dice-btn" class="trampoline-cta-pill pulse-cta">
+          🎲 ทอยลูกเต๋า 4 หน้า (SPACE)
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom-Left Quick Diary, Card Editor & 3D Camera Controls -->
+    <div class="bottom-left-dock">
+      <div class="camera-control-bar" title="ลากเมาส์เพื่อหมุนกระดาน • เลื่อนลูกกลิ้งเมาส์เพื่อซูม">
+        <button type="button" id="cam-rot-left" class="cam-btn" title="หมุนซ้าย (ปุ่ม Q หรือ ←)">↺</button>
+        <button type="button" id="cam-rot-right" class="cam-btn" title="หมุนขวา (ปุ่ม E หรือ →)">↻</button>
+        <button type="button" id="cam-tilt-toggle" class="cam-btn" title="สลับมุมมอง 3D / 2D มุมสูง">📐 3D</button>
+        <button type="button" id="cam-zoom-out" class="cam-btn" title="ซูมออก (-)">➖</button>
+        <span id="cam-zoom-label" class="cam-zoom-readout">100%</span>
+        <button type="button" id="cam-zoom-in" class="cam-btn" title="ซูมเข้า (+)">➕</button>
+        <button type="button" id="cam-reset" class="cam-btn cam-reset-btn" title="รีเซ็ตมุมกล้อง (ปุ่ม R)">🎯 รีเซ็ต</button>
+      </div>
+
+      <div class="dock-buttons-row">
+        <button type="button" id="btn-open-diary" class="dock-diary-btn" title="เปิดสมุดบันทึกผู้เล่นและสถิติ (Diary UI)">
+          <span class="diary-book-icon">📔</span>
+          <span>สมุดบันทึก &amp; สถิติผู้เล่น</span>
+        </button>
+        <button type="button" class="dock-diary-btn open-card-editor-btn" title="แก้ไขหรือวางข้อความการ์ดภารกิจทั้ง 40 ใบ">
+          <span class="diary-book-icon">🃏</span>
+          <span>จัดการการ์ด (40 ใบ)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom-Right Chunky Round Game Buttons (Exact match to Reference Image 1!) -->
+    <div class="bottom-right-round-controls">
+      <button type="button" id="btn-toggle-sfx" class="round-arcade-btn btn-cyan" title="เปิด/ปิดเสียงเอฟเฟกต์">
+        🔊
+      </button>
+      <button type="button" id="btn-toggle-bgm" class="round-arcade-btn btn-teal" title="เปิด/ปิดเพลงประกอบ">
+        🎵
+      </button>
+      <button type="button" id="btn-toggle-board-ref" class="round-arcade-btn btn-yellow" title="ดูภาพกระดานต้นฉบับ board.jpg">
+        🖼️
+      </button>
+      <button type="button" class="round-arcade-btn btn-purple open-rules-btn" title="กติกาการเล่น">
+        📖
+      </button>
+      <button type="button" id="btn-new-game" class="round-arcade-btn btn-pink" title="เริ่มตั้งค่าเกมใหม่">
+        ✖
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       OPEN-BOOK DIARY UI MODALS (Inspired by Reference Image 2!)
+       ======================================================================== -->
+
+  <!-- MODAL 1: PLAYER DIARY & STATS BOOK (Profile, Segmented Stat Bars, Activity) -->
+  <div id="diary-modal" class="modal-backdrop hidden">
+    <div class="diary-graph-frame">
+      <div class="corner-bracket cb-tl"></div>
+      <div class="corner-bracket cb-tr"></div>
+      <div class="corner-bracket cb-bl"></div>
+      <div class="corner-bracket cb-br"></div>
+
+      <div class="diary-top-wood-plaque">
+        <span>WELLBEING INVENTORY &amp; DIARY UI • สมุดบันทึกสุขภาพดี</span>
+      </div>
+
+      <div class="diary-book-wrapper">
+        <!-- Left Leather Clasp & Dangling Golden Key -->
+        <div class="diary-left-clasp">
+          <div class="clasp-button"></div>
+          <div class="dangling-key">🗝️</div>
+        </div>
+
+        <!-- Left Bookmark Tabs (Switch between Players) -->
+        <div id="diary-player-tabs" class="diary-left-tabs"></div>
+
+        <!-- Right Bookmark Tabs (Quick switch to Cards / Rules / Setup) -->
+        <div class="diary-right-tabs">
+          <button type="button" class="r-tab tab-gold" id="diary-tab-profile" title="ข้อมูลผู้เล่น">⭐</button>
+          <button type="button" class="r-tab tab-pink open-card-editor-btn" title="จัดการการ์ด 40 ใบ">❤️</button>
+          <button type="button" class="r-tab tab-blue open-rules-btn" title="กติกาการเล่น">✨</button>
+        </div>
+
+        <!-- Top Paperclipped Title Tab -->
+        <div class="diary-paperclip-tab">
+          <span class="paperclip-icon">📎</span>
+          <span id="diary-tab-title">PROFILE</span>
+        </div>
+
+        <!-- Close Button on Top-Right of Book -->
+        <button type="button" id="close-diary-btn" class="diary-close-circle" title="ปิดสมุดบันทึก">✖</button>
+
+        <!-- Two-Page Open Book Spread -->
+        <div class="diary-pages-spread">
+          <!-- LEFT PAGE: Player Profile, Likes/Tokens, Info & Wellbeing Badges -->
+          <div class="diary-page page-left">
+            <div class="diary-profile-card">
+              <div class="profile-ribbon">♥</div>
+              <div class="profile-avatar-circle" id="diary-p-avatar">🦁</div>
+              <div class="profile-text-col">
+                <div class="profile-name" id="diary-p-name">ผู้เล่น 1</div>
+                <div class="profile-handle" id="diary-p-handle">@WELLBEING_HERO</div>
+                <div class="profile-bio" id="diary-p-bio">
+                  นักเดินทางผู้มุ่งมั่นสะสมสุขภาวะที่ดีทั้ง 4 ด้านบนกระดานสุขภาพดี!
+                </div>
+              </div>
+            </div>
+
+            <div class="diary-social-strip">
+              <div class="social-metric">
+                <span class="sm-icon">🪙</span>
+                <div>
+                  <div class="sm-val" id="diary-p-tokens">2</div>
+                  <div class="sm-lbl">TOKENS</div>
+                </div>
+              </div>
+              <div class="social-metric">
+                <span class="sm-icon">🎲</span>
+                <div>
+                  <div class="sm-val" id="diary-p-pos">0/32</div>
+                  <div class="sm-lbl">TILE POS</div>
+                </div>
+              </div>
+              <div class="social-metric">
+                <span class="sm-icon">🏆</span>
+                <div>
+                  <div class="sm-val" id="diary-p-rank">#1</div>
+                  <div class="sm-lbl">RANKING</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="diary-meta-box">
+              <div class="meta-pair"><span>AGE:</span> <b id="diary-p-age">25 ปี</b></div>
+              <div class="meta-pair"><span>STATUS:</span> <b id="diary-p-status">กำลังเดินทาง</b></div>
+              <div class="meta-pair"><span>MISSIONS:</span> <b id="diary-p-missions">0 สำเร็จ</b></div>
+              <div class="meta-pair"><span>SKIPPED:</span> <b id="diary-p-skipped">0 ครั้ง</b></div>
+            </div>
+
+            <div class="diary-section-heading">COLLECTED WELLBEING BADGES</div>
+            <div class="diary-items-row">
+              <div class="diary-item-slot" title="ภารกิจแข็งแรง (สีแดง)">
+                <span class="item-emoji">💪</span>
+                <span class="item-count" id="diary-item-red">x0</span>
+              </div>
+              <div class="diary-item-slot" title="ภารกิจอารมณ์ดี (สีฟ้า)">
+                <span class="item-emoji">😊</span>
+                <span class="item-count" id="diary-item-blue">x0</span>
+              </div>
+              <div class="diary-item-slot" title="ภารกิจเพื่อนเยอะ (สีเขียว)">
+                <span class="item-emoji">🤝</span>
+                <span class="item-count" id="diary-item-green">x0</span>
+              </div>
+              <div class="diary-item-slot" title="ภารกิจมีเป้าหมาย (สีเหลือง)">
+                <span class="item-emoji">🎯</span>
+                <span class="item-count" id="diary-item-yellow">x0</span>
+              </div>
+              <div class="diary-item-slot" title="โบนัสลูกเต๋า (BONUS)">
+                <span class="item-emoji">🌟</span>
+                <span class="item-count" id="diary-item-bonus">+0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT PAGE: Segmented STATS Bars & RECENT ACTIVITY Log -->
+          <div class="diary-page page-right">
+            <div class="diary-section-heading">STATS (สุขภาวะทั้ง 4 ด้าน &amp; โบนัส)</div>
+            <div class="diary-stats-box" id="diary-stats-bars"></div>
+
+            <div class="diary-section-heading" style="margin-top:14px;">RECENT ACTIVITY (บันทึกกิจกรรมล่าสุด)</div>
+            <div class="diary-activity-list" id="diary-activity-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Page Navigation Arrows -->
+      <div class="diary-bottom-nav">
+        <button type="button" id="diary-prev-player" class="diary-nav-arrow">◄ PREVIOUS PLAYER</button>
+        <button type="button" id="diary-next-player" class="diary-nav-arrow">NEXT PLAYER ►</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: OPEN-BOOK GAME SETUP LOBBY (3-5 Players, Ages, Avatars) -->
+  <div id="setup-modal" class="modal-backdrop">
+    <div class="diary-graph-frame">
+      <div class="corner-bracket cb-tl"></div>
+      <div class="corner-bracket cb-tr"></div>
+      <div class="corner-bracket cb-bl"></div>
+      <div class="corner-bracket cb-br"></div>
+
+      <div class="diary-top-wood-plaque">
+        <span>BATTLE OF WELLBEING • ศึกชิงสุขภาพดี (NEW GAME SETUP)</span>
+      </div>
+
+      <div class="diary-book-wrapper">
+        <div class="diary-left-clasp">
+          <div class="clasp-button"></div>
+          <div class="dangling-key">🗝️</div>
+        </div>
+
+        <div class="diary-paperclip-tab">
+          <span class="paperclip-icon">📎</span>
+          <span>PARTY SETUP</span>
+        </div>
+
+        <div class="diary-pages-spread">
+          <!-- LEFT PAGE: Player Count, Token Pool Rules & Audio Settings -->
+          <div class="diary-page page-left">
+            <div class="diary-section-heading">1. เลือกจำนวนผู้เล่น (3–5 คน)</div>
+            <div class="player-count-selector">
+              <button type="button" class="player-count-btn active" data-count="3">
+                <span class="pc-num">3 คน</span>
+                <span class="pc-sub">30 โทเคน</span>
+              </button>
+              <button type="button" class="player-count-btn" data-count="4">
+                <span class="pc-num">4 คน</span>
+                <span class="pc-sub">40 โทเคน</span>
+              </button>
+              <button type="button" class="player-count-btn" data-count="5">
+                <span class="pc-num">5 คน</span>
+                <span class="pc-sub">50 โทเคน</span>
+              </button>
+            </div>
+
+            <div id="setup-token-summary" class="diary-note-callout">
+              🪙 ผู้เล่น <b>3 คน</b> • โทเคนรวม <b>30 โทเคน</b><br />
+              (แจกเริ่มต้นคนละ 2 โทเคน • คงเหลือในกองกลาง <b>24 โทเคน</b>)
+            </div>
+
+            <div class="diary-section-heading" style="margin-top:12px;">2. กติกาการเริ่มเล่น &amp; เสียง</div>
+            <label class="diary-checkbox-row">
+              <input type="checkbox" id="sort-by-age-check" checked />
+              <span>👑 ให้ผู้เล่นที่มีอายุมากที่สุดเริ่มทอยเป็นคนแรก (กติกาข้อ 1)</span>
+            </label>
+
+            <div class="diary-volume-row">
+              <span>🔉 ระดับเสียงเกม:</span>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.7" />
+            </div>
+
+            <div class="diary-quick-links">
+              <button type="button" class="diary-action-btn secondary open-card-editor-btn">
+                🃏 แก้ไข / วางข้อความการ์ด (40 ใบ)
+              </button>
+              <button type="button" class="diary-action-btn secondary open-rules-btn">
+                📖 อ่านกติกาการเล่น
+              </button>
+            </div>
+          </div>
+
+          <!-- RIGHT PAGE: Customize Players (Name, Age, Avatar) & Start Button -->
+          <div class="diary-page page-right">
+            <div class="diary-section-heading">3. ลงทะเบียนผู้เล่นลงสมุดสุขภาพดี</div>
+            <div id="setup-players-list" class="setup-players-grid"></div>
+
+            <button type="button" id="start-game-btn" class="diary-start-cta">
+              🎲 เริ่มออกเดินทางบนกระดานสุขภาพดี! ►
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: OPEN-BOOK 3D MISSION CARD MODAL -->
+  <div id="card-mission-modal" class="modal-backdrop hidden">
+    <div class="diary-graph-frame">
+      <div class="corner-bracket cb-tl"></div>
+      <div class="corner-bracket cb-tr"></div>
+      <div class="corner-bracket cb-bl"></div>
+      <div class="corner-bracket cb-br"></div>
+
+      <div class="diary-top-wood-plaque">
+        <span>WELLBEING MISSION CARD • การ์ดภารกิจสุขภาพดี</span>
+      </div>
+
+      <div class="diary-book-wrapper">
+        <div class="diary-left-clasp">
+          <div class="clasp-button"></div>
+          <div class="dangling-key">🗝️</div>
+        </div>
+
+        <div class="diary-paperclip-tab">
+          <span class="paperclip-icon">📎</span>
+          <span id="modal-category-badge">🤝 เพื่อนเยอะ</span>
+        </div>
+
+        <div class="diary-pages-spread">
+          <!-- LEFT PAGE: 3D Flipping Authentic Card Artwork -->
+          <div class="diary-page page-left card-left-showcase">
+            <div class="card-3d-stage" title="คลิกที่การ์ดเพื่อพลิกดูหน้า-หลัง">
+              <div id="card-flip-inner" class="card-flip-inner">
+                <div class="card-face card-face-back">
+                  <img id="modal-card-back-img" src="assets/green_back.jpg" alt="Card Back" />
+                </div>
+                <div class="card-face card-face-front">
+                  <img id="modal-card-front-bg" src="assets/green_front.jpg" alt="Card Front Template" />
+                  <div id="card-text-overlay" class="card-text-overlay">
+                    <div id="card-mission-title">โทรหาเพื่อนเก่า</div>
+                    <div id="card-mission-tiers-text">
+                      <div class="card-tier-line">1 คน = 1 โทเคน</div>
+                      <div class="card-tier-line">3 คน = 2 โทเคน</div>
+                      <div class="card-tier-line">5 คน = 3 โทเคน</div>
+                    </div>
+                    <div id="card-mission-penalty-text">ไม่โทร = จ่าย 2 โทเคน</div>
+                  </div>
+                  <div id="card-secret-cover" class="card-secret-cover hidden">
+                    <div class="secret-lock-icon">🙈</div>
+                    <div class="secret-lock-title">ความลับ! ส่งให้เพื่อนอ่าน</div>
+                    <div class="secret-lock-sub">เลือกเพื่อน 1 คนในหน้าขวาเพื่อเปิดอ่านการ์ดใบนี้ให้คุณฟัง</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-flip-caption">✨ คลิกที่การ์ดเพื่อพลิกดูหน้า-หลัง ✨</div>
+          </div>
+
+          <!-- RIGHT PAGE: Mission Instructions, Friend Reader Selector, Timer & Choices -->
+          <div class="diary-page page-right">
+            <div class="diary-card-player-row">
+              <span>ผู้รับภารกิจ:</span>
+              <b id="modal-active-player-pill">🦁 ผู้เล่น 1</b>
+            </div>
+
+            <div id="modal-rule-banner" class="diary-rule-callout">
+              📢 กติกา 3.1: อ่านออกเสียงภารกิจในการ์ดให้เพื่อนฟัง แล้วเลือกว่าจะทำภารกิจหรือไม่!
+            </div>
+
+            <!-- Rule 3.2 Friend Reader Selector (Shown for Blue & Yellow cards) -->
+            <div id="friend-reader-box" class="friend-reader-box hidden">
+              <div id="friend-reader-status">เลือกผู้เล่นคนอื่น 1 คน เป็นคนอ่านรายละเอียดในการ์ดให้ฟัง:</div>
+              <div id="friend-reader-buttons" class="friend-reader-buttons"></div>
+            </div>
+
+            <div class="card-tools-bar">
+              <button type="button" id="tts-read-card-btn" class="tool-mini-btn">
+                🔊 อ่านออกเสียง (TTS)
+              </button>
+              <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="15">⏱️ 15 วิ</button>
+              <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="30">⏱️ 30 วิ</button>
+              <button type="button" class="tool-mini-btn mission-timer-btn" data-seconds="45">⏱️ 45 วิ</button>
+              <span id="mission-timer-display" class="hidden">⏱️ 30 วินาที</span>
+            </div>
+
+            <div class="diary-section-heading" style="margin-top:8px;">
+              บันทึกผลลัพธ์ภารกิจ (รับ/จ่ายโทเคน):
+            </div>
+            <div id="modal-tier-buttons" class="modal-tier-buttons"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: BONUS SPACE ROLL MODAL -->
+  <div id="bonus-modal" class="modal-backdrop hidden">
+    <div class="diary-graph-frame compact-diary-frame">
+      <div class="diary-top-wood-plaque">
+        <span>🌟 BONUS ISLAND JACKPOT • ช่องโบนัสพิเศษ 🌟</span>
+      </div>
+      <div class="diary-single-page">
+        <h2 id="bonus-player-name" class="bonus-hero-name">🦁 ผู้เล่น 1</h2>
+        <p class="bonus-desc">
+          คุณเดินมาตกที่ช่อง <b>BONUS</b>! ได้รับสิทธิ์ทอยลูกเต๋า 4 หน้าพิเศษอีก 1 รอบ<br />
+          ทอยได้เลขอะไร รับโทเคนจากกองกลางไปเลยตามเลขนั้น!
+        </p>
+        <div id="bonus-d4-result" class="bonus-die-circle">?</div>
+        <p id="bonus-status-text" class="bonus-status-msg">กดปุ่มด้านล่างเพื่อทอยลูกเต๋าโบนัส!</p>
+        <button type="button" id="bonus-roll-btn" class="diary-start-cta">
+          🎲 ทอยลูกเต๋าโบนัส (รับ 1–4 โทเคน)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: CARD EDITOR & BULK PASTE MODAL -->
+  <div id="card-editor-modal" class="modal-backdrop hidden">
+    <div class="diary-graph-frame">
+      <div class="diary-top-wood-plaque">
+        <span>🃏 CARD DECK INVENTORY • จัดการการ์ดภารกิจทั้ง 40 ใบ</span>
+      </div>
+      <div class="diary-single-page wide-single-page">
+        <div class="editor-top-bar">
+          <div class="editor-cat-tabs">
+            <button type="button" class="editor-cat-tab active" data-cat="green">🤝 เพื่อนเยอะ (สีเขียว)</button>
+            <button type="button" class="editor-cat-tab" data-cat="red">💪 แข็งแรง (สีแดง)</button>
+            <button type="button" class="editor-cat-tab" data-cat="blue">😊 อารมณ์ดี (สีฟ้า)</button>
+            <button type="button" class="editor-cat-tab" data-cat="yellow">🎯 มีเป้าหมาย (สีเหลือง)</button>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="diary-action-btn secondary editor-mode-btn active" data-mode="visual">🗂️ แก้ไขทีละใบ</button>
+            <button type="button" class="diary-action-btn secondary editor-mode-btn" data-mode="bulk">📋 วางข้อความชุดใหญ่</button>
+            <button type="button" id="close-card-editor-btn" class="diary-action-btn">✖ ปิด</button>
+          </div>
+        </div>
+
+        <div id="editor-visual-pane">
+          <div id="editor-cards-grid" class="editor-cards-grid"></div>
+          <div class="editor-footer-bar">
+            <button type="button" id="reset-default-cards-btn" class="diary-action-btn secondary">
+              ♻️ รีเซ็ตทั้ง 40 ใบเป็นค่าเริ่มต้น
+            </button>
+            <button type="button" id="save-cards-btn" class="diary-start-cta" style="width:auto; padding:10px 24px;">
+              💾 บันทึกการแก้ไขหมวดนี้
+            </button>
+          </div>
+        </div>
+
+        <div id="editor-bulk-pane" class="hidden">
+          <div class="diary-note-callout" style="margin-bottom:8px;">
+            วางข้อความการ์ดบรรทัดละ 1 ใบ ในรูปแบบ:
+            <code>ชื่อภารกิจ | ระดับ 1 = 1 โทเคน | ระดับ 2 = 2 โทเคน | ระดับ 3 = 3 โทเคน | ไม่ทำ = จ่าย 2 โทเคน</code>
+          </div>
+          <textarea id="bulk-paste-textarea"></textarea>
+          <div class="editor-footer-bar" style="justify-content:flex-end;">
+            <button type="button" id="apply-bulk-paste-btn" class="diary-start-cta" style="width:auto; padding:10px 24px;">
+              ✅ นำเข้าข้อความการ์ดหมวดนี้
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: OFFICIAL RULES DIARY MODAL -->
+  <div id="rules-modal" class="modal-backdrop hidden">
+    <div class="diary-graph-frame">
+      <div class="diary-top-wood-plaque">
+        <span>📖 RULEBOOK &amp; GUIDE • กติกาการเล่นศึกชิงสุขภาพดี</span>
+      </div>
+      <div class="diary-book-wrapper">
+        <div class="diary-paperclip-tab">
+          <span class="paperclip-icon">📎</span>
+          <span>HOW TO PLAY</span>
+        </div>
+        <button type="button" id="close-rules-btn" class="diary-close-circle">✖</button>
+
+        <div class="diary-pages-spread">
+          <div class="diary-page page-left">
+            <div class="diary-section-heading">🛠️ การเตรียมเกม (SET UP)</div>
+            <div class="diary-rule-box">
+              <p>1. วางตัวละครตามจำนวนผู้เล่น (3–5 คน) ไว้ที่จุดเริ่มต้น <b>START !</b></p>
+              <p>2. แบ่งการ์ดเป็น 4 กองตามสีวางไว้กลางกระดาน: <b>แข็งแรง 10 ใบ (แดง)</b>, <b>อารมณ์ดี 10 ใบ (ฟ้า)</b>, <b>เพื่อนเยอะ 10 ใบ (เขียว)</b> และ <b>มีเป้าหมาย 10 ใบ (เหลือง)</b></p>
+              <p>3. โทเคนรวมตามจำนวนผู้เล่น: <b>3 คน = 30 โทเคน</b>, <b>4 คน = 40 โทเคน</b>, <b>5 คน = 50 โทเคน</b></p>
+              <p>4. แจกโทเคนเริ่มต้นจากกองกลางให้ผู้เล่นคนละ <b>2 โทเคน</b></p>
+            </div>
+
+            <div class="diary-section-heading" style="margin-top:12px;">🏆 การจบเกมและผู้ชนะ</div>
+            <div class="diary-note-callout">
+              เกมจะจบต่อเมื่อ <b>โทเคนหมดจากกองกลาง</b> หรือ <b>ผู้เล่นทุกคนเดินมาถึงจุดสิ้นสุดของเกม</b>
+              โดยผู้เล่นที่มีโทเคนเยอะที่สุดจะเป็นผู้ชนะ!
+            </div>
+          </div>
+
+          <div class="diary-page page-right">
+            <div class="diary-section-heading">🎲 วิธีการเล่น (GAMEPLAY)</div>
+            <div class="diary-rule-box">
+              <p>1. <b>ผู้เล่นที่มีอายุมากที่สุด</b> เริ่มเล่นเป็นคนแรก</p>
+              <p>2. คลิกที่แท่นแทรมโพลีนเพื่อทอยลูกเต๋า 4 หน้า (1–4) แล้วเดินตามเลขที่ได้</p>
+              <p>3. <b>กติกา 3.1 (สีแดง แข็งแรง / สีเขียว เพื่อนเยอะ):</b> อ่านออกเสียงภารกิจให้เพื่อนฟัง แล้วเลือกว่าจะทำหรือไม่</p>
+              <p>4. <b>กติกา 3.2 (สีฟ้า อารมณ์ดี / สีเหลือง มีเป้าหมาย):</b> เลือกผู้เล่นคนอื่น 1 คนเป็นคนอ่านรายละเอียดในการ์ดให้ฟัง</p>
+              <p>5. ทำสำเร็จรับ 1–3 โทเคนจากกองกลาง หากไม่ทำต้องจ่ายคืนกองกลาง 2 โทเคน</p>
+              <p>6. <b>ช่อง BONUS:</b> ทอยลูกเต๋า 4 หน้าอีก 1 รอบ ได้เลขอะไรรับโทเคนตามเลขนั้นทันที!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 7: VICTORY PODIUM DIARY MODAL -->
+  <div id="victory-modal" class="modal-backdrop hidden">
+    <div class="diary-graph-frame compact-diary-frame" style="max-width:680px;">
+      <div class="diary-top-wood-plaque">
+        <span>🏆 HALL OF WELLBEING CHAMPIONS • สรุปผลการแข่งขัน 🏆</span>
+      </div>
+      <div class="diary-single-page">
+        <div id="victory-reason-badge" class="diary-note-callout" style="margin-bottom:8px;">🏁 จบเกม</div>
+        <h2 id="victory-winner-headline" class="bonus-hero-name">🏆 ผู้ชนะคือ ผู้เล่น 1!</h2>
+        <div id="victory-rankings-list" class="victory-rankings-list"></div>
+        <button type="button" id="play-again-btn" class="diary-start-cta">
+          🔄 เล่นใหม่อีกรอบ!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notification -->
+  <div id="game-toast"></div>
+
+  <!-- Scripts -->
+  <script src="audio.js"></script>
+  <script src="fx.js"></script>
+  <script src="cards-data.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

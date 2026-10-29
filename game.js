@@ -100,7 +100,8 @@ class WellbeingGame {
   // 3D CAMERA: DRAG TO ROTATE / TILT, WHEEL OR PINCH TO ZOOM, RIGHT-DRAG TO PAN
   // ==========================================================================
   initCamera() {
-    this.camDefaults = { rot: -43, tilt: 54, zoom: 1, panX: 0, panY: 0 };
+    const isMobile = window.innerWidth <= 768;
+    this.camDefaults = { rot: -43, tilt: 54, zoom: isMobile ? 0.82 : 1, panX: 0, panY: isMobile ? -14 : 0 };
     this.cam = { ...this.camDefaults };
     this.camViewport = document.querySelector('.iso-viewport');
     const vp = this.camViewport;
